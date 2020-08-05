@@ -215,25 +215,57 @@ def is_immutable(path: Path) -> bool:
     return bool(pathlib.Path(path).stat().st_mode & stat.SF_IMMUTABLE)
 
 
-MountAttrs = typing.List[typing.Mapping]
+MountAttrs = typing.Mapping
+MountInfo = typing.Union[typing.Mapping, typing.Any, None]
 
 
-def _test_mount_attrs_itr(path: pathlib.Path, with_: MountAttrs) -> bool:
+def _get_mount_info_using_psutil(path: pathlib.Path) -> MountInfo:
+    """
+    :return: psutil._common.sdiskpart object holding mount point info
+    """
+    mnt = [pmnt for pmnt in psutil.disk_partitions()
+           if pmnt.mountpoint == str(path)]
+
+    if not mnt:
+        return None
+
+    keys = ("device", "mountpoint", "fstype", "opts")
+    return {key: getattr(mnt, key) for key in keys}
+
+
+def _mnt_opts_parse_itr(opts: str) -> typing.Iterator[str]:
+    """
+    :return: Parse a given mount options string and make a dict hodling them
+    """
+    isep = ','
+    kvsep = '='
+
+    for opt in opts.split(isep):
+        if kvsep in opt:
+            yield tuple(opt.split(kvsep))
+        else:
+            yield (opt, True)
+
+
+def _test_mount_attrs(path: pathlib.Path, with_: MountAttrs,
+                      mnt: MountInfo = None) -> bool:
     """
     :return: True if the object at the path `path` is immutable
     """
-    mnt = [pmnt for pmnt in psutil.disk_partitions()
-           if pmnt.mountpoint == str(path)][0]  # It must be found.
+    if mnt is None:
+        mnt = _get_mount_info_using_psutil(path)  # Should be a mapping obj.
 
     for attr, val in with_.items():
         if attr == "opts":  # special case.
-            for opt, oval in val:
+            mopts = dict(_mnt_opts_parse_itr(mnt.get("opts", "")))
+            for mattr, mval in val.items():
+                if mopts.get(mattr, None) != mval:
+                    return False
+        else:
+            return mnt.get(attr, None) == val
 
 
-
-
-def is_mounted(path: Path,
-               with_: typing.Union[typing.List[typing.Mapping], None]) -> bool:
+def is_mounted(path: Path, with_: typing.Union[MountAttrs, None]) -> bool:
     """
     :return: True if the object at the path `path` is immutable
     """
@@ -242,6 +274,6 @@ def is_mounted(path: Path,
     if with_ is None:
         return path.is_mount()
 
-    if 
+    return _test_mount_attrs(path, with_)
 
 # vim:sw=4:ts=4:et:
