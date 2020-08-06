@@ -6,16 +6,17 @@
 #
 """File tests.
 """
-from __future__ import absolute_import
-
 import enum
+import hashlib
 import os
 import pathlib
 import re
 import stat
 import typing
 
+import anyconfig
 import psutil
+import selinux
 
 
 Path = typing.Union[str, pathlib.Path]
@@ -43,6 +44,15 @@ class ExecBy(enum.Enum):
     USER = stat.S_IXUSR
     GROUP = stat.S_IXGRP
     OTHER = stat.S_IXOTH
+
+
+class Checksum(enum.Enum):
+    """File checksum type."""
+
+    MD5 = hashlib.md5
+    SHA1 = hashlib.sha1
+    SHA256 = hashlib.sha256
+    SHA512 = hashlib.sha512
 
 
 def is_file(path: Path) -> bool:
@@ -267,7 +277,7 @@ def _test_mount_attrs(path: pathlib.Path, with_: MountAttrs,
 
 def is_mounted(path: Path, with_: typing.Union[MountAttrs, None]) -> bool:
     """
-    :return: True if the object at the path `path` is immutable
+    :return: True if the object at the path `path` is mounted
     """
     path = pathlib.Path(path)
 
@@ -275,5 +285,60 @@ def is_mounted(path: Path, with_: typing.Union[MountAttrs, None]) -> bool:
         return path.is_mount()
 
     return _test_mount_attrs(path, with_)
+
+
+def has_checksum(path: Path, csum: str,
+                 csum_fun: typing.Union[Checksum, None]) -> bool:
+    """
+    :return: True if the file at the path `path` has given checksum
+    """
+    path = pathlib.Path(path)
+
+    if csum_fun is None:
+        csum_fun = Checksum.SHA256
+
+    return csum_fun(path.read_bytes()).hexdigest() == csum
+
+
+def has_size(path: Path, size: str) -> bool:
+    """
+    :param path: The path to target object
+    :param size: Expected file size in bytes
+
+    :return: True if the file at the path `path` has given size
+    """
+    return pathlib.Path(path).stat().st_size == size
+
+
+def has_selinux_label(path: Path, label: str) -> bool:
+    """
+    :param path: The path to target object
+    :param size: Expected SELinux label
+
+    :return: True if the file at the path `path` has given SELinux label
+    """
+    # .. note::
+    #    Allow partial matches like 'system_u:object_r:etc_t' vs.
+    #    '...(same)...:s0' (w/ MLS attribute).
+    return selinux.getfilecon(str(path))[-1].startswith(label)
+
+
+# TODO:
+FileContentType = typing.Union[str, typing.Mapping, typing.Any, None]
+
+
+def load(path: Path, filetype: str = None) -> FileContentType:
+    """
+    :param path: The path to target object
+    :param filetype: Expected file type, e.g. yaml and json
+
+    :return: Loaded content as str or an (maybe mapping) object
+    """
+    path = pathlib.Path(path)
+
+    if filetype is None:
+        return path.read_text()
+
+    return anyconfig.load(path)
 
 # vim:sw=4:ts=4:et:
