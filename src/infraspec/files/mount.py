@@ -6,68 +6,95 @@
 #
 """Mounted point related.
 """
+import collections
 import pathlib
+import re
 import typing
-
-import psutil
 
 from .common import Path
 
 
 MountAttrs = typing.Mapping
-MountInfo = typing.Union[typing.Mapping, typing.Any, None]
+MountInfo = typing.Union[typing.Mapping, None]
 
 
-def _get_mount_info_using_psutil(path: pathlib.Path) -> MountInfo:
+_PROC_MNT_LINE_RE = re.compile(
+    r"(?P<device>\S+)\s+"
+    r"(?P<mountpoint>/\S+)\s+"
+    r"(?P<type>\S+)\s+"
+    r"(?P<options>\S+)\s+"
+)
+
+
+MountTpl = typing.Tuple[str, typing.Mapping]
+
+
+def _parse_proc_mounts() -> typing.Iterator[MountTpl]:
     """
-    :return: psutil._common.sdiskpart object holding mount point info
+    :return: A list of mapping objects each gives mount info
     """
-    mnt = [pmnt for pmnt in psutil.disk_partitions()
-           if pmnt.mountpoint == str(path)]
+    for line in pathlib.Path("/proc/mounts").read_text().splitlines():
+        match = _PROC_MNT_LINE_RE.match(line)
+        if match is None:
+            continue  # Although it should not happen ...
 
-    if not mnt:
-        return None
+        minfo = match.groupdict()
+        opts = dict(opt.split('=') if '=' in opt else (opt, True)
+                    for opt in minfo["options"].split(','))
 
-    keys = ("device", "mountpoint", "fstype", "opts")
-    return {key: getattr(mnt, key) for key in keys}
+        yield (minfo["mountpoint"],
+               dict(device=minfo["device"], type=minfo["type"], options=opts))
 
 
-def _mnt_opts_parse_itr(opts: str) -> typing.Iterator[str]:
+def _get_mount_info_by_path(path: pathlib.Path) -> MountInfo:
     """
-    :return: Parse a given mount options string and make a dict hodling them
+    :return: A mapping object gives mount info for given mount point
     """
-    isep = ','
-    kvsep = '='
+    for mountpoint, minfo in _parse_proc_mounts():
+        if mountpoint == str(path):
+            return minfo
 
-    for opt in opts.split(isep):
-        if kvsep in opt:
-            yield tuple(opt.split(kvsep))
-        else:
-            yield (opt, True)
+    return None
 
 
-def _test_mount_attrs(path: pathlib.Path, with_: MountAttrs,
-                      mnt: MountInfo = None) -> bool:
+def _dict_included(lhs: typing.Mapping, rhs: typing.Mapping) -> bool:
     """
-    :return: True if the object at the path `path` is immutable
-    """
-    if mnt is None:
-        mnt = _get_mount_info_using_psutil(path)  # Should be a mapping obj.
+    :return: True if lhs is included in rhs
 
-    for attr, val in with_.items():
-        if attr == "opts":  # special case.
-            mopts = dict(_mnt_opts_parse_itr(mnt.get("opts", "")))
-            for mattr, mval in val.items():
-                if mopts.get(mattr, None) != mval:
-                    return False
-        else:
-            return mnt.get(attr, None) == val
+    >>> dic = dict(a=1, b=dict(c=2))
+    >>> ref = dict(a=1, b=dict(c=2), d=dict(e="E"))
+    >>> _dict_included(ref, dic)
+    False
+    >>> _dict_included(dic, {})
+    False
+    >>> _dict_included(dic, ref)
+    True
+    """
+    for key, val in lhs.items():
+        if key not in rhs or rhs[key] != val:
+            return False
 
     return True
 
 
+def _test_mount_attrs(path: pathlib.Path, with_: MountAttrs,
+                      exact_match: bool = False) -> bool:
+    """
+    :return:
+        True if the object at the path `path` is mounted with expected
+        attributes
+    """
+    minfo = _get_mount_info_by_path(path)
+
+    if exact_match:
+        return with_ == minfo
+
+    return _dict_included(with_, minfo)
+
+
 def is_mounted(path: Path,
-               with_: typing.Union[MountAttrs, None] = None) -> bool:
+               with_: typing.Union[MountAttrs, None] = None,
+               only_with: typing.Union[MountAttrs, None] = None) -> bool:
     """
     :return: True if the object at the path `path` is mounted
     """
@@ -75,6 +102,9 @@ def is_mounted(path: Path,
 
     if with_ is None:
         return path.is_mount()
+
+    if only_with:
+        return _test_mount_attrs(path, only_with, exact_match=True)
 
     return _test_mount_attrs(path, with_)
 

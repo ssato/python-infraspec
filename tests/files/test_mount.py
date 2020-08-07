@@ -10,5 +10,6 @@ import infraspec.files.mount as TT
 
 def test_is_mounted():
     assert TT.is_mounted("/")
+    assert TT.is_mounted("/proc", with_=dict(type="proc"))
 
 # vim:sw=4:ts=4:et:
