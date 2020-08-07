@@ -14,7 +14,7 @@ python-infraspec
    :target: https://pypi.python.org/pypi/python-infraspec/
    :alt: MIT License
 
-.. .. image:: https://github.com/ssato/python-infraspec/workflows/Tests/badge.svg
+.. image:: https://github.com/ssato/python-infraspec/workflows/Tests/badge.svg
    :target: https://github.com/ssato/python-infraspec/actions?query=workflow%3ATests
    :alt: GHA Test status
 
