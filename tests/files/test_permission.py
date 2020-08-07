@@ -5,7 +5,6 @@
 # pylint: disable=missing-function-docstring
 """File tests.
 """
-import os
 import pathlib
 
 import infraspec.files.permission as TT

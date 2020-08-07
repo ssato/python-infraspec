@@ -6,7 +6,6 @@
 #
 """Mounted point related.
 """
-import collections
 import pathlib
 import re
 import typing

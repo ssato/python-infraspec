@@ -7,7 +7,6 @@
 """Basic file test functions.
 """
 import pathlib
-import re
 
 from .common import Path
 
