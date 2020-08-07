@@ -5,7 +5,7 @@
 # pylint: disable=missing-function-docstring
 """File tests.
 """
-import infraspec.files.selinux as TT
+import infraspec.files.selinux_ as TT
 
 
 def test_has_selinux_label():
