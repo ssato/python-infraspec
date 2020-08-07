@@ -19,7 +19,7 @@ from .common import Path
 FileContentType = typing.Union[str, typing.Mapping, typing.Any, None]
 
 
-def get_content(path: Path, **oargs: typing.Union[str, int]) -> str:
+def get_content(path: Path) -> str:
     """
     :param path: File path
     :raises: Error, OSError, IOError and so on
