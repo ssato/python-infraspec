@@ -31,7 +31,7 @@ _MNTS_0 = [
 ]
 
 
-def test_get_mounts_itr__from_sys(tmpdir):
+def test_get_mounts_itr__from_sys():
     assert list(TT.get_mounts_itr())  # Should be some results.
 
 
