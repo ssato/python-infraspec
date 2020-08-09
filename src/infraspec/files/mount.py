@@ -14,7 +14,7 @@ from .common import Path
 
 
 MountAttrs = typing.Mapping
-MountInfo = typing.Union[typing.Mapping, None]
+MaybeMountInfo = typing.Optional[typing.Mapping]
 
 
 _PROC_MNT_LINE_RE = re.compile(
@@ -45,7 +45,7 @@ def _parse_proc_mounts() -> typing.Iterator[MountTpl]:
                dict(device=minfo["device"], type=minfo["type"], options=opts))
 
 
-def _get_mount_info_by_path(path: pathlib.Path) -> MountInfo:
+def _get_mount_info_by_path(path: pathlib.Path) -> MaybeMountInfo:
     """
     :return: A mapping object gives mount info for given mount point
     """
@@ -92,8 +92,8 @@ def _test_mount_attrs(path: pathlib.Path, with_: MountAttrs,
 
 
 def is_mounted(path: Path,
-               with_: typing.Union[MountAttrs, None] = None,
-               only_with: typing.Union[MountAttrs, None] = None) -> bool:
+               with_: typing.Optional[MountAttrs] = None,
+               only_with: typing.Optional[MountAttrs] = None) -> bool:
     """
     :return: True if the object at the path `path` is mounted
     """

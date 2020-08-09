@@ -44,7 +44,7 @@ def contain(path: Path, pattern: str, **oargs: typing.Union[str, int]) -> bool:
     return False
 
 
-def load(path: Path, ftype: typing.Union[str, None] = None) -> FileContentType:
+def load(path: Path, ftype: typing.Optional[str] = None) -> FileContentType:
     """
     :param path: The path to target object
     :param filetype: Expected file type, e.g. yaml and json

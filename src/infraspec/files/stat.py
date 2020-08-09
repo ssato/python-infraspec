@@ -24,7 +24,7 @@ class Checksum(enum.Enum):
 
 
 def get_checksum(path: Path,
-                 csum_fun: typing.Union[Checksum, None] = None) -> bool:
+                 csum_fun: typing.Optional[Checksum] = None) -> bool:
     """
     :return: Checksum value of the file of given path
     """
@@ -37,7 +37,7 @@ def get_checksum(path: Path,
 
 
 def has_checksum(path: Path, csum: str,
-                 csum_fun: typing.Union[Checksum, None] = None) -> bool:
+                 csum_fun: typing.Optional[Checksum] = None) -> bool:
     """
     :return: True if the file at the path `path` has given checksum
     """

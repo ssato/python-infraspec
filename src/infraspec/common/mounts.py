@@ -14,8 +14,8 @@ from .custom_types import (
 )
 
 
-MaybeMntTblPath = typing.Union[Path, None]
-MaybeMntInfo = typing.Union[MountInfo, None]
+MaybeMntTblPath = typing.Optional[Path]
+MaybeMntInfo = typing.Optional[MountInfo]
 
 _PROC_MNT_LINE_RE = re.compile(
     r"(?P<device>\S+)\s+"
