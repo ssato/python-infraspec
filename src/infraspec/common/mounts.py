@@ -54,7 +54,7 @@ def get_mounts(mnttbl: MaybeMntTblPath = None,
     """
     .. seealso:: above :func:`get_mounts_itr`
     """
-    return [minfo for minfo in get_mounts_itr(mnttbl, reg)]
+    return list(get_mounts_itr(mnttbl, reg))
 
 
 @functools.lru_cache(maxsize=8)
