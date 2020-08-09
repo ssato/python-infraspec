@@ -18,7 +18,7 @@ from ..common import Path, get_mount_info_by_path
 
 _CNF_ROOT = "/sys/fs/selinux"
 _CNF = "/etc/selinux/config"
-_CNF_RE = re.compile("^(\w+)=(\w+)$")
+_CNF_RE = re.compile(r"^(\w+)=(\w+)$")
 
 
 @functools.lru_cache(maxsize=8)
