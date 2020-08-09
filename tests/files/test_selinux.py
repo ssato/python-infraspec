@@ -11,7 +11,7 @@ import infraspec.files.selinux_ as TT
 
 try:
     import selinux
-    selinux.getfilecon  # noqa: F401
+    selinux.getfilecon  # pylint:disable=pointless-statement
     SELINUX_IS_NOT_AVAIL = False
 except AttributeError:
     SELINUX_IS_NOT_AVAIL = True
