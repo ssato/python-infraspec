@@ -22,7 +22,7 @@ _CNF_RE = re.compile(r"^(\w+)=(\w+)$")
 
 
 @functools.lru_cache(maxsize=8)
-def is_selinux_enabled(root: Path = _CNF_ROOT) -> bool:
+def is_enabled(root: Path = _CNF_ROOT) -> bool:
     """
     Determine if SELinux is enabled or not.
 
@@ -49,7 +49,7 @@ def get_config(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
     """
     default = {}
 
-    if not is_selinux_enabled(root):
+    if not is_enabled(root):
         return default
 
     path = pathlib.Path(cnf_path)

@@ -31,12 +31,12 @@ SELINUXTYPE=targeted
 _CNF_1 = dict(SELINUX="enforcing", SELINUXTYPE="targeted")
 
 
-def test_is_selinux_enabled():
-    assert not TT.is_selinux_enabled(pathlib.Path(__file__).parent)
-    TT.is_selinux_enabled.cache_clear()
+def test_is_enabled():
+    assert not TT.is_enabled(pathlib.Path(__file__).parent)
+    TT.is_enabled.cache_clear()
 
-    assert TT.is_selinux_enabled("/")  # see its impl.
-    TT.is_selinux_enabled.cache_clear()
+    assert TT.is_enabled("/")  # see its impl.
+    TT.is_enabled.cache_clear()
 
 
 def test_get_config(tmpdir):
@@ -44,12 +44,12 @@ def test_get_config(tmpdir):
     path = pathlib.Path(tmpdir) / "config"
 
     assert TT.get_config(path, root) == {}
-    TT.is_selinux_enabled.cache_clear()
+    TT.is_enabled.cache_clear()
     TT.get_config.cache_clear()
 
     path.write_text(_CNF_CONTENT_1)
     assert TT.get_config(path, root) == _CNF_1
-    TT.is_selinux_enabled.cache_clear()
+    TT.is_enabled.cache_clear()
     TT.get_config.cache_clear()
 
 
@@ -58,12 +58,12 @@ def test_get_mode(tmpdir):
     path = pathlib.Path(tmpdir) / "config"
 
     assert TT.get_mode(path, root) == "disabled"
-    TT.is_selinux_enabled.cache_clear()
+    TT.is_enabled.cache_clear()
     TT.get_config.cache_clear()
 
     path.write_text(_CNF_CONTENT_1)
     assert TT.get_mode(path, root) == "enforcing"
-    TT.is_selinux_enabled.cache_clear()
+    TT.is_enabled.cache_clear()
     TT.get_config.cache_clear()
 
 
@@ -72,12 +72,12 @@ def test_get_policy_type(tmpdir):
     path = pathlib.Path(tmpdir) / "config"
 
     assert TT.get_policy_type(path, root) == "targeted"
-    TT.is_selinux_enabled.cache_clear()
+    TT.is_enabled.cache_clear()
     TT.get_config.cache_clear()
 
     path.write_text(_CNF_CONTENT_1)
     assert TT.get_policy_type(path, root) == "targeted"
-    TT.is_selinux_enabled.cache_clear()
+    TT.is_enabled.cache_clear()
     TT.get_config.cache_clear()
 
 # vim:sw=4:ts=4:et:
