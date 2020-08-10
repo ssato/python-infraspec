@@ -8,8 +8,6 @@
 """
 import pathlib
 
-import pytest
-
 import infraspec.selinux.selinux_ as TT
 
 
