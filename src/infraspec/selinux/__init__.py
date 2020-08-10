@@ -9,6 +9,6 @@ from .selinux_ import (  # noqa: F401
     is_enforcing, is_permissive, is_disabled
 )
 from .utils import has_selinux_label  # noqa: F401
-from .modules import is_installed
+from .modules import is_installed  # noqa: F401
 
 # vim:sw=4:ts=4:et:
