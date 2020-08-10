@@ -15,6 +15,7 @@ from ..common import Path, get_mount_info_by_path
 
 
 (ENFORCING, PERMISSIVE, DISABLED) = ("enforcing", "permissive", "disabled")
+POLS = (POL_TARGETED, POL_MINIMUM, POL_MLS) = ("targeted", "minimum", "mls")
 
 _CNF_ROOT = "/sys/fs/selinux"
 _CNF = "/etc/selinux/config"
@@ -73,5 +74,46 @@ def get_policy_type(cnf_path: Path = _CNF, root: Path = _CNF_ROOT) -> str:
     :return: Encorcing mode, one of enforcing, permissive and disabled
     """
     return get_config(cnf_path, root).get("SELINUXTYPE", "targeted")
+
+
+def is_in_mode_with_policy(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
+                           mode: str = "enforcing",
+                           with_policy: typing.Optional[str] = None) -> bool:
+    """
+    Is it in SELinux enforcing mode?
+    """
+    if get_mode(cnf_path, root) != mode:
+        return False
+
+    if not with_policy:
+        return True
+
+    if with_policy not in POLS:
+        raise ValueError("Invalid policy type: {}".format(with_policy))
+
+    return get_policy_type(cnf_path, root) == with_policy
+
+
+def is_enforcing(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
+                 with_policy: typing.Optional[str] = None) -> bool:
+    """
+    Is it in SELinux enforcing mode with given policy optionally?
+    """
+    return is_in_mode_with_policy(cnf_path, root, "enforcing", with_policy)
+
+
+def is_permissive(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
+                  with_policy: typing.Optional[str] = None) -> bool:
+    """
+    Is it in SELinux permissive mode with given policy optionally?
+    """
+    return is_in_mode_with_policy(cnf_path, root, "permissive", with_policy)
+
+
+def is_disabled(cnf_path: Path = _CNF, root: Path = _CNF_ROOT) -> bool:
+    """
+    Is SELinux disabled
+    """
+    return not is_enabled(root) or get_mode(cnf_path, root) == "disalbed"
 
 # vim:sw=4:ts=4:et:
