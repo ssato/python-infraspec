@@ -111,6 +111,6 @@ def test_is_permissive(tmpdir):
 
 def test_is_disabled(tmpdir):
     (root, path) = get_root_and_path(tmpdir)
-    assert not TT.is_disabled(path, root)
+    assert TT.is_disabled(path, root)
 
 # vim:sw=4:ts=4:et:

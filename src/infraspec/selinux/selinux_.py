@@ -12,18 +12,16 @@ import re
 import typing
 
 from ..common import Path, get_mount_info_by_path
+from .constants import (
+    ENFORCING, PERMISSIVE, DISABLED, POLICIES, POL_TARGETED, ROOT, CONFIG
+)
 
 
-(ENFORCING, PERMISSIVE, DISABLED) = ("enforcing", "permissive", "disabled")
-POLS = (POL_TARGETED, POL_MINIMUM, POL_MLS) = ("targeted", "minimum", "mls")
-
-_CNF_ROOT = "/sys/fs/selinux"
-_CNF = "/etc/selinux/config"
-_CNF_RE = re.compile(r"^(\w+)=(\w+)$")
+_LINE_RE = re.compile(r"^(\w+)=(\w+)$")
 
 
 @functools.lru_cache(maxsize=8)
-def is_enabled(root: Path = _CNF_ROOT) -> bool:
+def is_enabled(root: Path = ROOT) -> bool:
     """
     Determine if SELinux is enabled or not.
 
@@ -41,8 +39,8 @@ def is_enabled(root: Path = _CNF_ROOT) -> bool:
 
 
 @functools.lru_cache(maxsize=8)
-def get_config(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
-               cnf_line_re: typing.Pattern = _CNF_RE) -> typing.Mapping:
+def get_config(cnf_path: Path = CONFIG, root: Path = ROOT,
+               cnf_line_re: typing.Pattern = _LINE_RE) -> typing.Mapping:
     """
     :return: A mapping object holding SELinux configuration info or None
 
@@ -62,22 +60,22 @@ def get_config(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
                 if line and not line.startswith("#"))
 
 
-def get_mode(cnf_path: Path = _CNF, root: Path = _CNF_ROOT) -> str:
+def get_mode(cnf_path: Path = CONFIG, root: Path = ROOT) -> str:
     """
     :return: Encorcing mode, one of enforcing, permissive and disabled
     """
     return get_config(cnf_path, root).get("SELINUX", "disabled")
 
 
-def get_policy_type(cnf_path: Path = _CNF, root: Path = _CNF_ROOT) -> str:
+def get_policy_type(cnf_path: Path = CONFIG, root: Path = ROOT) -> str:
     """
     :return: Encorcing mode, one of enforcing, permissive and disabled
     """
-    return get_config(cnf_path, root).get("SELINUXTYPE", "targeted")
+    return get_config(cnf_path, root).get("SELINUXTYPE", POL_TARGETED)
 
 
-def is_in_mode_with_policy(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
-                           mode: str = "enforcing",
+def is_in_mode_with_policy(cnf_path: Path = CONFIG, root: Path = ROOT,
+                           mode: str = ENFORCING,
                            with_policy: typing.Optional[str] = None) -> bool:
     """
     Is it in SELinux enforcing mode?
@@ -88,32 +86,32 @@ def is_in_mode_with_policy(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
     if not with_policy:
         return True
 
-    if with_policy not in POLS:
+    if with_policy not in POLICIES:
         raise ValueError("Invalid policy type: {}".format(with_policy))
 
     return get_policy_type(cnf_path, root) == with_policy
 
 
-def is_enforcing(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
+def is_enforcing(cnf_path: Path = CONFIG, root: Path = ROOT,
                  with_policy: typing.Optional[str] = None) -> bool:
     """
     Is it in SELinux enforcing mode with given policy optionally?
     """
-    return is_in_mode_with_policy(cnf_path, root, "enforcing", with_policy)
+    return is_in_mode_with_policy(cnf_path, root, ENFORCING, with_policy)
 
 
-def is_permissive(cnf_path: Path = _CNF, root: Path = _CNF_ROOT,
+def is_permissive(cnf_path: Path = CONFIG, root: Path = ROOT,
                   with_policy: typing.Optional[str] = None) -> bool:
     """
     Is it in SELinux permissive mode with given policy optionally?
     """
-    return is_in_mode_with_policy(cnf_path, root, "permissive", with_policy)
+    return is_in_mode_with_policy(cnf_path, root, PERMISSIVE, with_policy)
 
 
-def is_disabled(cnf_path: Path = _CNF, root: Path = _CNF_ROOT) -> bool:
+def is_disabled(cnf_path: Path = CONFIG, root: Path = ROOT) -> bool:
     """
     Is SELinux disabled
     """
-    return not is_enabled(root) or get_mode(cnf_path, root) == "disalbed"
+    return not is_enabled(root) or get_mode(cnf_path, root) == DISABLED
 
 # vim:sw=4:ts=4:et:
