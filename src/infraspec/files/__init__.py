@@ -13,7 +13,6 @@ from .mount import is_mounted  # noqa: F401
 from .permission import (  # noqa: F401
     has_mode, is_readable, is_writable, is_executable, is_immutable
 )
-from .selinux_ import has_selinux_label  # noqa: F401
 from .stat import (  # noqa: F401
     get_checksum, has_checksum, get_size, has_size
 )
