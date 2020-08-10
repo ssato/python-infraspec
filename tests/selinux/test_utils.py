@@ -7,18 +7,13 @@
 """
 import pytest
 
-import infraspec.files.selinux_ as TT
-
 try:
-    import selinux
-    selinux.getfilecon  # pylint:disable=pointless-statement
-    SELINUX_IS_NOT_AVAIL = False
+    import infraspec.selinux.utils as TT
 except AttributeError:
-    SELINUX_IS_NOT_AVAIL = True
+    TT = False
 
 
-@pytest.mark.skipif(SELINUX_IS_NOT_AVAIL,
-                    reason="selinux.getfilecon is not available")
+@pytest.mark.skipif(not TT, reason="Necessary module is not available")
 def test_has_selinux_label():
     slabel = "unconfined_u:object_r:user_home_t:s0"  # TODO
     assert TT.has_selinux_label(__file__, slabel, strict=True)
