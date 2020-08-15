@@ -29,7 +29,7 @@ def get_running_service_itr():
     for svc in random.sample(svcs, len(svcs)):
         try:
             cmd = "systemctl is-active {}".format(svc).split()
-            _res = subprocess.check_call(cmd)
+            subprocess.check_call(cmd)
             yield svc
         except subprocess.CalledProcessError:
             pass
