@@ -11,6 +11,8 @@ from ..common import Path
 try:
     import selinux
 
+    selinux.getfilecon  # pylint: disable=pointless-statement
+
     def get_selinux_label(path: str) -> str:
         """Get file's SELinux label."""
         return selinux.getfilecon(path)[-1]
