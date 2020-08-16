@@ -28,9 +28,12 @@ def test_get_all_groups():
     assert res
     assert [usr for usr in res if usr.get("gid") == os.getgid()]
 
+    TT.get_all_groups.cache_clear()
+
 
 def test_get_user_by_name():
     assert TT.get_user_by_name(USERNAME)
+    TT.get_user_by_name.cache_clear()
 
 
 def test_get_user_by_name_with_group():
@@ -39,6 +42,8 @@ def test_get_user_by_name_with_group():
     assert res
     assert res["groups"]
 
+    TT.get_user_by_name.cache_clear()
+
 
 def test_get_group_by_name():
     usr = TT.get_user_by_name(USERNAME, group=True)
@@ -46,5 +51,8 @@ def test_get_group_by_name():
 
     for group in usr["groups"]:
         assert TT.get_group_by_name(group)
+
+    TT.get_user_by_name.cache_clear()
+    TT.get_group_by_name.cache_clear()
 
 # vim:sw=4:ts=4:et:

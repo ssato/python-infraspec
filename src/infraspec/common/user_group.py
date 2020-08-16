@@ -28,6 +28,7 @@ def get_all_groups() -> typing.List[typing.Mapping]:
     return sorted(get_all_groups_itr(), key=operator.itemgetter("name"))
 
 
+@functools.lru_cache(maxsize=8)
 def get_user_by_name(name: str,
                      group: bool = False) -> typing.Optional[typing.Mapping]:
     """
@@ -49,6 +50,7 @@ def get_user_by_name(name: str,
     return None
 
 
+@functools.lru_cache(maxsize=8)
 def get_group_by_name(name: str) -> typing.Optional[typing.Mapping]:
     """
     Get group info by group's name from group database.
