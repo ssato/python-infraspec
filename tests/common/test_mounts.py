@@ -6,8 +6,6 @@
 #
 """Mounts tests.
 """
-import pathlib
-
 import infraspec.common.mounts as TT
 
 
@@ -35,10 +33,10 @@ def test_get_mounts_itr__from_sys():
     assert list(TT.get_mounts_itr())  # Should be some results.
 
 
-def test_get_mounts_itr__from_file(tmpdir):
+def test_get_mounts_itr__from_file(tmp_path):
     assert list(TT.get_mounts_itr())  # Should be some results.
 
-    mtab = pathlib.Path(tmpdir) / "mtab"
+    mtab = tmp_path / "mtab"
     mtab.touch()
     assert not list(TT.get_mounts_itr(mtab))
 
@@ -46,8 +44,8 @@ def test_get_mounts_itr__from_file(tmpdir):
     assert list(TT.get_mounts_itr(mtab)) == _MNTS_0
 
 
-def test_get_mount_info_by_path(tmpdir):
-    mtab = pathlib.Path(tmpdir) / "mtab"
+def test_get_mount_info_by_path(tmp_path):
+    mtab = tmp_path / "mtab"
     mtab.write_text(_MTAB_0)
 
     assert TT.get_mount_info_by_path("/", mtab) == _MNTS_0[0][-1]

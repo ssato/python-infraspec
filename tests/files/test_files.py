@@ -54,16 +54,16 @@ def test_is_character_deivce():
     assert not TT.is_character_deivce(__file__)
 
 
-def test_is_pipe(tmpdir):
-    path = pathlib.Path(tmpdir) / "test.fifo"
+def test_is_pipe(tmp_path):
+    path = tmp_path / "test.fifo"
     os.mkfifo(str(path))
 
     assert TT.is_pipe(path)
     assert not TT.is_pipe(__file__)
 
 
-def test_is_socket(tmpdir):
-    path = pathlib.Path(tmpdir) / "test.sock"
+def test_is_socket(tmp_path):
+    path = tmp_path / "test.sock"
 
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.bind(str(path))
@@ -75,8 +75,8 @@ def test_is_socket(tmpdir):
         sock.close()
 
 
-def test_is_symlink(tmpdir):
-    path = pathlib.Path(tmpdir) / "test.symlink"
+def test_is_symlink(tmp_path):
+    path = tmp_path / "test.symlink"
     os.symlink(__file__, path)
 
     assert TT.is_symlink(path)
@@ -97,9 +97,9 @@ def test_is_grouped_into():
     assert not TT.is_grouped_into(__file__, "root")
 
 
-def test_is_linked_to(tmpdir):
-    path = pathlib.Path(tmpdir) / "test.symlink"
-    path2 = (pathlib.Path(tmpdir) / "test.txt")
+def test_is_linked_to(tmp_path):
+    path = tmp_path / "test.symlink"
+    path2 = tmp_path / "test.txt"
     os.symlink(__file__, path)
 
     assert TT.is_linked_to(path, __file__)

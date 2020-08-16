@@ -5,7 +5,6 @@
 # pylint: disable=missing-function-docstring
 """File tests.
 """
-import pathlib
 import uuid
 
 import infraspec.files.contents as TT
@@ -21,8 +20,8 @@ def test_contain():
     assert not TT.contain(__file__, str(uuid.uuid4()))
 
 
-def test_load(tmpdir):
-    path = pathlib.Path(tmpdir) / "test.json"
+def test_load(tmp_path):
+    path = tmp_path / "test.json"
     data = dict(a=1, b=dict(c="c", d=[1, 2]))
     TT.anyconfig.dump(data, path)
 

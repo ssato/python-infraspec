@@ -31,10 +31,10 @@ SELINUXTYPE=targeted
 _CNF_1 = dict(SELINUX="enforcing", SELINUXTYPE="targeted")
 
 
-def get_root_and_path(tmpdir, write_config=False):
+def get_root_and_path(tmp_path, write_config=False):
     TT.is_enabled.cache_clear()
     TT.get_config.cache_clear()
-    (root, path) = ("/", pathlib.Path(tmpdir) / "config")
+    (root, path) = ("/", tmp_path / "config")
 
     if write_config:
         path.write_text(_CNF_CONTENT_1)
@@ -50,67 +50,67 @@ def test_is_enabled():
     TT.is_enabled.cache_clear()
 
 
-def test_get_config__default(tmpdir):
-    (root, path) = get_root_and_path(tmpdir)
+def test_get_config__default(tmp_path):
+    (root, path) = get_root_and_path(tmp_path)
 
     assert TT.get_config(path, root) == {}
 
 
-def test_get_config__from_file(tmpdir):
-    (root, path) = get_root_and_path(tmpdir, True)
+def test_get_config__from_file(tmp_path):
+    (root, path) = get_root_and_path(tmp_path, True)
 
     assert TT.get_config(path, root) == _CNF_1
 
 
-def test_get_mode__empty_config(tmpdir):
-    (root, path) = get_root_and_path(tmpdir)
+def test_get_mode__empty_config(tmp_path):
+    (root, path) = get_root_and_path(tmp_path)
 
     assert TT.get_mode(path, root) == "disabled"
 
 
-def test_get_mode__from_file(tmpdir):
-    (root, path) = get_root_and_path(tmpdir, True)
+def test_get_mode__from_file(tmp_path):
+    (root, path) = get_root_and_path(tmp_path, True)
 
     assert TT.get_mode(path, root) == "enforcing"
 
 
-def test_get_policy_type__default(tmpdir):
-    (root, path) = get_root_and_path(tmpdir)
+def test_get_policy_type__default(tmp_path):
+    (root, path) = get_root_and_path(tmp_path)
 
     assert TT.get_policy_type(path, root) == "targeted"
 
 
-def test_get_policy_type__from_file(tmpdir):
-    (root, path) = get_root_and_path(tmpdir, True)
+def test_get_policy_type__from_file(tmp_path):
+    (root, path) = get_root_and_path(tmp_path, True)
 
     assert TT.get_policy_type(path, root) == "targeted"
 
 
-def test_is_enforcing__disabled(tmpdir):
-    (root, path) = get_root_and_path(tmpdir)
+def test_is_enforcing__disabled(tmp_path):
+    (root, path) = get_root_and_path(tmp_path)
     assert not TT.is_enforcing(path, root)
 
 
-def test_is_enforcing__enabled(tmpdir):
-    (root, path) = get_root_and_path(tmpdir, True)
+def test_is_enforcing__enabled(tmp_path):
+    (root, path) = get_root_and_path(tmp_path, True)
 
     assert TT.is_enforcing(path, root)
 
 
-def test_is_enforcing__with_policy(tmpdir):
-    (root, path) = get_root_and_path(tmpdir, True)
+def test_is_enforcing__with_policy(tmp_path):
+    (root, path) = get_root_and_path(tmp_path, True)
 
     assert not TT.is_enforcing(path, root, "mls")
     assert TT.is_enforcing(path, root, "targeted")
 
 
-def test_is_permissive(tmpdir):
-    (root, path) = get_root_and_path(tmpdir)
+def test_is_permissive(tmp_path):
+    (root, path) = get_root_and_path(tmp_path)
     assert not TT.is_permissive(path, root)
 
 
-def test_is_disabled(tmpdir):
-    (root, path) = get_root_and_path(tmpdir)
+def test_is_disabled(tmp_path):
+    (root, path) = get_root_and_path(tmp_path)
     assert TT.is_disabled(path, root)
 
 # vim:sw=4:ts=4:et:

@@ -5,13 +5,11 @@
 # pylint: disable=missing-function-docstring
 """File tests.
 """
-import pathlib
-
 import infraspec.files.permission as TT
 
 
-def test_has_mode(tmpdir):
-    path = pathlib.Path(tmpdir) / "test.txt"
+def test_has_mode(tmp_path):
+    path = tmp_path / "test.txt"
     path.touch()
 
     mode = 0o750
@@ -31,8 +29,8 @@ def test_is_writable():
     assert TT.is_readable(__file__, access_by="root")
 
 
-def test_is_executable(tmpdir):
-    path = pathlib.Path(tmpdir) / "test.txt"
+def test_is_executable(tmp_path):
+    path = tmp_path / "test.txt"
     path.touch()
 
     mode = 0o755
