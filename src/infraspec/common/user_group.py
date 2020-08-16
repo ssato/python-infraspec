@@ -64,4 +64,19 @@ def get_group_by_name(name: str) -> typing.Optional[typing.Mapping]:
 
     return None
 
+
+@functools.lru_cache(maxsize=8)
+def get_group_by_gid(gid: int) -> typing.Optional[typing.Mapping]:
+    """
+    Get group info by group's gid from group database.
+    """
+    try:
+        group = grp.getgrgid(gid)
+        return dict(gid=gid, name=group.gr_name, members=group.gr_mem)
+
+    except KeyError:
+        pass
+
+    return None
+
 # vim:sw=4:ts=4:et:
