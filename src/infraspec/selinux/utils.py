@@ -2,17 +2,10 @@
 # Copyright (C) 2020 Satoru SATOH <satoru.satoh@gmail.com>.
 # SPDX-License-Identifier: MIT
 #
-# ref. https://serverspec.org/resource_types.html#file
+# pylint: disable=import-outside-toplevel
 #
 """Utilities
 """
-try:
-    import selinux
-    LIBSELINUX_AVAIL = True
-except ImportError:
-    import xattr  # https://github.com/xattr/xattr
-    LIBSELINUX_AVAIL = False
-
 from ..common import Path
 
 
@@ -20,10 +13,14 @@ def get_selinux_label(path: str) -> str:
     """
     Get file's SELinux label
     """
-    if LIBSELINUX_AVAIL:
-        return selinux.getfilecon(path)[-1]
+    try:
+        import selinux
 
-    return xattr.get(path, "security.selinux").decode("utf-8")[:-1]
+        return selinux.getfilecon(path)[-1]
+    except (ImportError, AttributeError):
+        import xattr  # https://github.com/xattr/xattr
+
+        return xattr.get(path, "security.selinux").decode("utf-8")[:-1]
 
 
 def has_selinux_label(path: Path, label: str, strict: bool = False) -> bool:
