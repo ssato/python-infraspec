@@ -18,7 +18,7 @@ def get_selinux_label(path: str) -> str:
 
         return selinux.getfilecon(path)[-1]
     except (ImportError, AttributeError):
-        import xattr  # https://github.com/xattr/xattr
+        import xattr  # https://github.com/iustin/pyxattr
 
         return xattr.get(path, "security.selinux").decode("utf-8")[:-1]
 

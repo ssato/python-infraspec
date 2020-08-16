@@ -1,4 +1,4 @@
 anyconfig
 psutil
 selinux
-xattr
+pyxattr
