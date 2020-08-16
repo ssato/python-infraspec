@@ -7,15 +7,20 @@
 """
 import pytest
 
+import infraspec.selinux.utils as TT
+
+
 try:
-    import infraspec.selinux.utils as TT
-except AttributeError:
-    TT = False
+    TT.get_selinux_label(__file__)
+    SELINUX_WORKS = True
+except OSError:
+    SELINUX_WORKS = False
 
 
-@pytest.mark.skipif(not TT, reason="Necessary module is not available")
+@pytest.mark.skipif(not SELINUX_WORKS,
+                    reason="SELinux does not work as expected.")
 def test_has_selinux_label():
-    slabel = "unconfined_u:object_r:user_home_t:s0"  # TODO
+    slabel = "unconfined_u:object_r:user_home_t:s0"
     assert TT.has_selinux_label(__file__, slabel, strict=True)
     assert TT.has_selinux_label(__file__, slabel[:-3])
     assert not TT.has_selinux_label(__file__, slabel[:-3], strict=True)
