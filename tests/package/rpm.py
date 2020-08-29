@@ -14,11 +14,11 @@ import infraspec.package.rpm as TT
 RPM_IS_NOT_AVAIL = False
 try:
     PKG_FULL = TT.subprocess.run(
-        "rpm -q rpm".split(), capture_output=True
+        "rpm -q rpm".split(), stdout=TT.subprocess.PIPE
     ).stdout.decode("utf-8").rstrip()
 
     (PKG_NAME, PKG_VER) = TT.subprocess.run(
-        "rpm -q --qf %{n},%{v} rpm".split(), capture_output=True
+        "rpm -q --qf %{n},%{v} rpm".split(), stdout=TT.subprocess.PIPE
     ).stdout.decode("utf-8").rstrip().split(',')
 
 except AttributeError:

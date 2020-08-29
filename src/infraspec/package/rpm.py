@@ -37,7 +37,7 @@ def get_installed(name: str, version: str = None,
     Get a package or packages list matches given name and version optionally.
     """
     cmd = rpm_query(name, version, nvrae=nvrae)
-    res = subprocess.run(cmd, capture_output=True, check=False)
+    res = subprocess.run(cmd, stdout=subprocess.PIPE, check=False)
 
     return res.stdout.decode("utf-8").rstrip() if res.returncode == 0 else None
 
