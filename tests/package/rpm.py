@@ -23,6 +23,7 @@ try:
 
 except (AttributeError, ValueError):
     RPM_IS_NOT_AVAIL = True
+    PKG_FULL = PKG_NAME = PKG_VER = None
 
 
 @pytest.mark.skipif(RPM_IS_NOT_AVAIL, reason="Could not get rpm package info.")
