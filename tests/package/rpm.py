@@ -21,7 +21,7 @@ try:
         "rpm -q --qf %{n},%{v} rpm".split(), stdout=TT.subprocess.PIPE
     ).stdout.decode("utf-8").rstrip().split(',')
 
-except AttributeError:
+except (AttributeError, ValueError):
     RPM_IS_NOT_AVAIL = True
 
 
