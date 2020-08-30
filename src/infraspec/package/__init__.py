@@ -4,8 +4,5 @@
 #
 """Package test functions.
 """
-from .rpm import (  # noqa: F401
-    get_installed, is_installed
-)
 
 # vim:sw=4:ts=4:et:
