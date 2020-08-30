@@ -1,4 +1,5 @@
 anyconfig
 psutil
 selinux
+pip
 pyxattr
