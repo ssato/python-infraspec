@@ -21,7 +21,7 @@ def make_cmd_itr(path: typing.Optional[str] = None, outdated: bool = False,
     ['pip', 'list', '--format=json']
     >>> list(make_cmd_itr(outdated=True))
     ['pip', 'list', '--format=json', '--outdated']
-    >>> list(make_cmd_itr(False, "tmp")
+    >>> list(make_cmd_itr(False, "tmp"))
     ['pip', 'list', '--format=json', '--outdated']
     """
     for cmd_s in "pip list --format=json".split():
