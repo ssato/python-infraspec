@@ -12,31 +12,31 @@ import subprocess
 import typing
 
 
-_SYSCTL_VAL_RE = re.compile(r"^(?P<name>[a-z][^ =]+) = (?P<value>(.*)?)$")
+_SYSCTL_VAL_RE = re.compile(r"^(?P<name>[a-z][^ =]+) =(?: )?(?P<value>.*)?$")
 
 
 def _parse(result: str, pattern: typing.Pattern = None
-           ) -> typing.Optional[typing.Mapping]:
+           ) -> typing.Optional[typing.Tuple[str, str]]:
     """
     Parse the output of sysctl command.
 
     >>> _parse("")
-    None
     >>> _parse("dev.cdrom.info =")
-    {'dev.cdrom.inf': ''}
+    ('dev.cdrom.info', '')
     >>> _parse("dev.cdrom.info = drive name:")
-    {'dev.cdrom.inf': 'drive name:'}
+    ('dev.cdrom.info', 'drive name:')
     >>> _parse("dev.i915.perf_stream_paranoid = 1")
-    {'dev.i915.perf_stream_paranoid': '1'}
+    ('dev.i915.perf_stream_paranoid', '1')
     """
     if not pattern:
         pattern = _SYSCTL_VAL_RE
 
     match = pattern.match(result)
-    return match.groupdict() if match else None
+    return match.groups() if match else None
 
 
-def _get(name: typing.Optional[str] = None) -> typing.List[typing.Mapping]:
+def _get(name: typing.Optional[str] = None
+         ) -> typing.List[typing.Tuple[str, str]]:
     """
     Get all of or specific sysctl configurations.
     """
@@ -51,7 +51,7 @@ def _get(name: typing.Optional[str] = None) -> typing.List[typing.Mapping]:
     return []  # I think it should not happen but just in case.
 
 
-def list() -> typing.List[typing.Mapping]:
+def list() -> typing.List[typing.Tuple[str, str]]:
     """
     Get all of sysctl configurations.
     """
@@ -64,7 +64,7 @@ def get(name: str) -> typing.List[str]:
     """
     results = _get(name)
     if results:
-        return [param["value"] for param in results]
+        return [param[-1] for param in results]
 
     return []
 
